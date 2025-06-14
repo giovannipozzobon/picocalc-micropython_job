@@ -1,6 +1,6 @@
 #  PicoCalc Micropython Setup
 
-I am finding embedded development to be an infuriating experience.  Thank you to the community for making this barely understandable for my primitive brain.
+I am finding embedded development to be an infuriating experience.  Thanks to the community for making this barely understandable for my primitive brain.
 
 ## Features
 
@@ -25,19 +25,34 @@ I am finding embedded development to be an infuriating experience.  Thank you to
 ## Quickstart
 
 ### Step 1:  Copy RP2+W (2350 + Wifi) image to device
+* Per Experience, Not Documentation!
+* **Copy Base Image to Hardware:**
+    * Hold down reset button on the RP hardware.
+    * Insert USB-Micro cable connect to your computer.
+    * Release button on the RP hardware
+    * Your device should have a filesystem mount for the Pico hardware.
+    * Drag **ONLY** the pico firmware UF2 file to this device.
+    * The device will unmount itself, likely generating an annoying error. 
+* **Copy Support Scripts <u>prior</u> to booting device**
+    * Disconnect and reconnect the USB-micro cable to the 2350 hardare
+    * Restart the Thonny instance
+    * Setup Thonny
+        * Navigate to the `./lib` folder on the RP 2350 hardware
+    * <span style="color:red">See Developer docs for help unti lI have mental bandwidth to correct these notes</span>
+    
 
-Use `Thonny`
 
 
 ## Pre-Setup Notes:
 
 * I chose to not use `zenodante`'s approach to compile the core APIs as frozen files.  This makes it impossible to edit them from my laptop after you setup the PicoCalc.
+    * For newbies like me, `frozen` files are Python sources you `compile` into bytecode.  This makes them exist in the filesystem, but not using the built-in filesystem.  Aka:  Consider it a *magical* filesystem.
 
 * I instead only keep the `boot.py` and `main.py` from the filesystem variant. Everything else goes into this `./lib` folder.
 
 * I have copies of the files, latest as of 6/13/2025, in my repo.  I modified them a bit, as a few minor parts if his APIs are non-functional. 
 
-* <span style="color:red"><b><u>TODO: Submit PR to his repo!</u></b></span>
+* <span style="color:red"><b><u>TODO: Submit PR to zenodante's repo with relvent changes!</u></b></span>
 
 
 ## Setup Pico
