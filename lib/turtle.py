@@ -8,6 +8,10 @@ import time
 import picocalc
 from picocalc import display, keyboard, terminal
 
+#--------------------------------#
+#-      Global Definitions      -#
+#--------------------------------#
+g_screen = None
 
 class Key:
     '''
@@ -403,13 +407,22 @@ def screensize():
     return (320,320)
 
 def init():
-
-    return TurtleScreen()
+    global g_screen
+    g_screen = TurtleScreen()
+    return g_screen
 
 def reset():
 
     a = init()
     a.reset()
+
+def fill_rect( x, y, w, h, color ):
+    global g_screen
+    return g_screen.fill_rect( x, y, w, h, color )
+
+def draw_text( text, x, y, color ):
+    global g_screen
+    return g_screen.draw_text( x, y, color )
 
 def check_keyboard( verbose = False ):
 
