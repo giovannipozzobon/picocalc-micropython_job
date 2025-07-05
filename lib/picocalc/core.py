@@ -1,14 +1,14 @@
 
 #  Micropython Libraries
+import array
+from collections import deque
 import framebuf
-import struct
-import time
-from micropython import const
 import machine
 from machine import Pin, I2C, PWM, SPI
-from collections import deque
+from micropython import const
+import struct
+import time
 import uos
-import array
 
 #  Project Libraries
 import picocalcdisplay
@@ -47,46 +47,6 @@ _StatePress = const(1)
 _StateLongPress = const(2)
 _StateRelease = const(3)
 
-'''
-import uctypes
-from uctypes import struct, OBJ, NATIVE_UINTPTR, UINT16, UINT8, LITTLE_ENDIAN
-from uctypes import addressof
-
-W2, H2 = 320, 320
-buf2 = bytearray(W2 * H2/2)
-
-# typedef struct _mp_obj_framebuf_t {
-#     mp_obj_base_t base;    // offset 0, 4 bytes
-#     mp_obj_t      buf_obj; // offset 4, 4 bytes
-#     void         *buf;     // offset 8, 4 bytes
-#     uint16_t      width;   // offset 12, 2 bytes
-#     uint16_t      height;  // offset 14, 2 bytes
-#     uint16_t      stride;  // offset 16, 2 bytes
-#     uint8_t       format;  // offset 18, 1 byte
-# } mp_obj_framebuf_t;
-layout = {
-    'buf_obj': (OBJ,              4),
-    'buf_ptr': (NATIVE_UINTPTR,   8),
-    'width':   (UINT16  | LITTLE_ENDIAN, 12),
-    'height':  (UINT16  | LITTLE_ENDIAN, 14),
-    'stride':  (UINT16  | LITTLE_ENDIAN, 16),
-    'format':  (UINT8,            18),
-}
-
-
-fb_s = struct(addressof(display), layout)
-fb_s.buf_obj = buf2
-fb_s.buf_ptr = addressof(buf2)
-
-#fb_s.width  = W2
-#fb_s.height = H2
-#fb_s.stride = W2
-
-#fb_s.format = framebuf.GS8
-
-
-
-'''
 class PicoDisplay(framebuf.FrameBuffer):
     def __init__(self, width, height,color_type = framebuf.GS4_HMSB, skip_init = False):
         self.width = width
@@ -309,7 +269,8 @@ class PicoKeyboard:
                     elif key == 0xa5:
                         self.isCtrl = False
                     elif key == 0xa1:
-                        self.isAlt = False   
+                        self.isAlt = False
+
                 #self.hardwarekeyBuf.append(key[:])
         #now deside how many keys to send to buf
         requestedkeys = len(buf)
@@ -380,11 +341,14 @@ class PicoSD:
         if self.sd is None:
             try:
                 self.sd = sdcard.SDCard(
-                    machine.SPI(self.spi_bus, baudrate=self.baudrate, polarity=0, phase=0,
-                                sck=machine.Pin(self.sck_pin),
-                                mosi=machine.Pin(self.mosi_pin),
-                                miso=machine.Pin(self.miso_pin)),
-                    machine.Pin(self.cs_pin)
+                    machine.SPI( self.spi_bus,
+                                 baudrate=self.baudrate,
+                                 polarity=0,
+                                 phase=0,
+                                 sck=machine.Pin(self.sck_pin),
+                                 mosi=machine.Pin(self.mosi_pin),
+                                 miso=machine.Pin(self.miso_pin)),
+                                 machine.Pin(self.cs_pin)
                 )
                 uos.mount(self.sd, self.mount_point)
                 print(f"{Fore.GREEN}SD card mounted successfully at", self.mount_point)

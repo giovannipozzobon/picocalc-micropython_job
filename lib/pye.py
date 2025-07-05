@@ -1,12 +1,15 @@
 #modified version pye 
 #original from https://github.com/robert-hh/Micropython-Editor/tree/master
 PYE_VERSION = " V2.78 "
+
+#  Micropython Libraries
 try:
     import usys as sys
 except:
     import sys
 import gc
 import re
+
 if sys.implementation.name == "micropython":
     is_micropython = True
     import uos as os
@@ -25,7 +28,10 @@ import re
 from re import compile as re_compile
 import time
 from highlighter import Highlighter
-from default_style import syntax_style
+
+
+#  PicoCalc APIs
+from picocalc.default_style import syntax_style
 
 KEY_NONE = const(0x00)
 KEY_UP = const(0x0B)
@@ -501,7 +507,6 @@ class Editor:
             pos += way
         return pos
     def move_up(self):
-        #print("move_up cur line %d top_line %d",self.cur_line,self.top_line)
         if self.cur_line > 0:
             self.cur_line -= 1
             if self.cur_line < self.top_line:
@@ -518,7 +523,6 @@ class Editor:
         if not self.skip_up():
             self.col -= 1
     def move_down(self):
-        #print("move_down cur line %d top_line %d",self.cur_line,self.top_line)
         if self.cur_line < self.total_lines - 1:
             self.cur_line += 1
             if self.cur_line == self.top_line + Editor.height:
@@ -821,14 +825,12 @@ class Editor:
         elif key == KEY_SCRLUP:
             ni = 1 if char is None else 3
             if self.top_line > 0:
-                #print("scrup self top line %d ni %d", self.top_line, ni)
                 self.top_line = max(self.top_line - ni, 0)
                 self.cur_line = min(self.cur_line, self.top_line + Editor.height - 1)
                 self.scroll_up(ni)
         elif key == KEY_SCRLDN:
             ni = 1 if char is None else 3
             if self.top_line + Editor.height < self.total_lines:
-                #print("scrdn self top line %d ni %d", self.top_line, ni)
                 self.top_line = min(self.top_line + ni, self.total_lines - 1)
                 self.cur_line = max(self.cur_line, self.top_line)
                 self.scroll_down(ni)

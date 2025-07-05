@@ -5,8 +5,8 @@ import sys
 import time
 
 #  Project Libraries
-import colors
-import picocalc
+import picocalc.colors as colors
+import picocalc.core as pico
 import turtle
 
 
@@ -36,9 +36,9 @@ def run_full( log_level = logging.DEBUG, log_path = './hardware.log' ):
         screen.fill_rect( 10, 30, 300, 280, colors.GS4.GRAY )
         screen.draw_text( "Status Information:", 10, 40, colors.GS4.GREEN )
 
-        screen.draw_text( " - Battery Status    : " + str(int(picocalc.keyboard.battery())),            10, 60, colors.GS4.GREEN )
-        screen.draw_text( " - Screen Backlight  : " + str(picocalc.keyboard.backlight()),          10,  80, colors.GS4.GREEN )
-        screen.draw_text( " - Keyboard Backlight: " + str(picocalc.keyboard.backlight_keyboard()), 10,  100, colors.GS4.GREEN )
+        screen.draw_text( " - Battery Status    : " + str(int(pico.keyboard.battery())),            10, 60, colors.GS4.GREEN )
+        screen.draw_text( " - Screen Backlight  : " + str(pico.keyboard.backlight()),          10,  80, colors.GS4.GREEN )
+        screen.draw_text( " - Keyboard Backlight: " + str(pico.keyboard.backlight_keyboard()), 10,  100, colors.GS4.GREEN )
         
 
         screen.draw_text( "> Select Option: ", 10, 270, colors.GS4.GREEN )

@@ -3,8 +3,8 @@
 class GS4:
     BLACK      =  0
     GRAY       =  8
-    RED		   =  9
-    GREEN 	   = 10
+    RED        =  9
+    GREEN      = 10
     YELLOW     = 11
     BLUE       = 12
     PURPLE     = 13

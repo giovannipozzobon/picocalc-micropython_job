@@ -8,13 +8,17 @@ https://github.com/micropython/micropython-lib/blob/master/micropython/drivers/s
 Features various system functions such as mounting and unmounting the PicoCalc's SD card, a nicer run utility, and an ls utility
 
 """
-import os
-import uos
-import machine
-import sdcard
+
+#  Micropython Libraries
 import gc
+import micropython
 from micropython import const
-import picocalc
+import os
+import sdcard
+import uos
+
+
+import picocalc.core as pico
 from colorer import Fore, Back, Style, print, autoreset
 
 autoreset(True)
@@ -63,7 +67,7 @@ def screenshot_bmp(buffer, filename, width=320, height=320, palette=None):
 
     # Default VT100 16-color palette
     if palette is None:
-        lut = picocalc.display.getLUT() #get memoryview of the current LUT
+        lut = pico.display.getLUT() #get memoryview of the current LUT
         palette = []
         for i in range(16):
             raw = lut[i]
@@ -128,7 +132,6 @@ def screenshot_bmp(buffer, filename, width=320, height=320, palette=None):
             row_data = buffer[start:start + ((width + 1) // 2)]
             f.write(row_data)
             f.write(bytes(row_bytes - len(row_data)))  # Padding
-
 
 def run(filename):
     """
@@ -230,3 +233,64 @@ def disk():
         else:
             if path == '/sd':
                 print("No SD Card Mounted.")
+    
+def initsd():
+    """
+    SD Card mounting utility for PicoCalc.
+    Utility is specifically for the PicoCalc's internal SD card reader, as it is tuned for its pins.
+    
+    Inputs: None
+    Outputs: None (Mounts SD card if it is present)
+    """
+    def list_dir(path, indent=0):
+        ignore = [".Spotlight-V100", ".Trashes"]
+        
+        try:
+            entries = os.listdir(path)
+        except OSError as e:
+            print(f"⚠️  Cannot open {path}: {e}")
+            return  # Stop if path doesn't exist
+
+        for entry in entries:
+            if entry in ignore:
+                continue  # 🚫 Skip system files/folders
+
+            full_path = path + "/" + entry
+            try:
+                if os.stat(full_path)[0] & 0x4000:  # Directory flag
+                    # print("  " * indent + f"[DIR] {entry}")
+                    list_dir(full_path, indent + 1)
+                else:
+                    #print("  " * indent + f"     {entry}")
+                    print("Go time!")
+            except OSError as e:
+                print("  " * indent + f"Error reading {full_path}: {e}")
+
+    # 👇 Only run if /sd exists
+    if "sd" in os.listdir("/"):
+        list_dir("/sd")
+    else:
+        print("⚠️  /sd not found. Is the SD card mounted?")
+
+    return
+
+def killsd(sd_mnt="/sd"):
+    """
+    SD Card unmounting utility for PicoCalc.
+    Could technically function on any device with uos, since it uses the mount point.
+    
+    Inputs: Filepath to SD mount point
+    Output: None, unmounts SD
+    """
+    if pico.sd is not None:
+        try:
+            uos.umount(sd_mnt)
+            pico.sd = None
+        except Exception as e: 
+            print(f"Failed to unmount SD card: {e}")
+    return
+
+def checksd(sd_mnt="/sd"):
+    if is_dir(sd_mnt):
+        print(f"{Fore.GREEN}SD Mounted Successfully.")
+    return

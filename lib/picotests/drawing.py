@@ -6,7 +6,7 @@ import sys
 import time
 
 #  Project Libraries
-import colors
+import picocalc.colors as colors
 import turtle
 
 

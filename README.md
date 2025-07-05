@@ -5,7 +5,7 @@ I am finding embedded development to be an infuriating experience.  Thanks to th
 ## Features
 
 * Libraries:
-    * `picocalc.py` : Minor updates to `zenodante`'s API.
+    * `picocalc` : Minor updates to `zenodante`'s API.
     * `turtle.py`   : My start of a turtle API for PicoCalc.
 * Tests:
     * `picotests/drawing.py`  : Sample of `turtle` drawing calls.
