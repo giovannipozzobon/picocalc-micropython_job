@@ -36,7 +36,7 @@ def run_full( log_level = logging.DEBUG, log_path = './hardware.log' ):
         screen.fill_rect( 10, 30, 300, 280, colors.GS4.GRAY )
         screen.draw_text( "Status Information:", 10, 40, colors.GS4.GREEN )
 
-        screen.draw_text( " - Battery Status    : " + str(int(pico.keyboard.battery())),            10, 60, colors.GS4.GREEN )
+        screen.draw_text( " - Battery Status    : " + int.from_bytes(pico.keyboard.battery())),            10, 60, colors.GS4.GREEN )
         screen.draw_text( " - Screen Backlight  : " + str(pico.keyboard.backlight()),          10,  80, colors.GS4.GREEN )
         screen.draw_text( " - Keyboard Backlight: " + str(pico.keyboard.backlight_keyboard()), 10,  100, colors.GS4.GREEN )
         
@@ -48,7 +48,8 @@ def run_full( log_level = logging.DEBUG, log_path = './hardware.log' ):
         
         for key in keys:
             if key == turtle.Key.ESCAPE:
-                screen.draw_text("Hello PicoCalc!", 10, 310, 15, colors.GS4.GREEN )
+                screen.draw_text("Hello PicoCalc!", 10, 310, colors.GS4.GREEN )
+                okay_to_run = False
                 break
     
         time.sleep(0.1)
@@ -63,4 +64,7 @@ def run( log_level = logging.DEBUG, log_path = './hardware.log'  ):
         run_full( log_level, log_path )
     except Exception as e:
         turtle.reset()
-        logging.error( 'Exception caught: ', e )
+        print('EXCEPTION')
+        sys.print_exception( e )
+        logging.error( 'Exception caught: {}'.format(e) )
+        sys.print_exception( e )

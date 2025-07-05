@@ -5,8 +5,7 @@ import logging
 import time
 
 # PicoCalc Libraries
-import picocalc
-from picocalc import display, keyboard, terminal
+from picocalc.core import display, keyboard, terminal
 
 #--------------------------------#
 #-      Global Definitions      -#
