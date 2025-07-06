@@ -74,7 +74,6 @@ class vt(uio.IOBase):
         self.framebuf.recoverRefresh()
 
     def wr(self,input):
-        #print("WR:", repr(input))
         for c in input:
             if ord(c) == 0x07:
                 pass

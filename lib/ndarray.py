@@ -182,3 +182,25 @@ def eye( dims, dtype = float ):
                 data[r].append( dtype( 0 ) )
     return array( data, dtype = dtype )
 
+def mat_mul( matA, matB ):
+  dshape = (matA.shape[0],
+          matB.shape[1])
+  
+  output = zeros( shape = dshape ) 
+  
+  for i in range(matA.shape[0]):
+    for j in range(matB.shape[1]):
+      sum = 0
+      for k in range(matA.shape[1]):
+        sum += matA[i,k] * matB[k,j]
+      output[i,j] = sum
+      
+  return output
+  
+def dot( val1, val2 ):
+    
+    if isinstance(val1,array):
+        return val1 * val2
+    elif isinstance(val2,array):
+        return val2 * val1
+        
