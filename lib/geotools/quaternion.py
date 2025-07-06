@@ -1,7 +1,7 @@
 
 import math
 
-import ndarray as np
+import geotools.ndarray as np
 
 class Quaternion:
   
