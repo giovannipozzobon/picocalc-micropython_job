@@ -2,16 +2,26 @@
 
 I am finding embedded development to be an infuriating experience.  Thanks to the community for making this barely understandable for my primitive brain.
 
+You'll notice a lot of geospatial and math stuff being added.  I use a TI Nspire graphing calculator to do a lot of Micropython programming.  I'd love to transition to this.
+
 ## Features
 
-* Libraries:
+* Libraries I've Added from MicroPython Package Manager
+    * `logging`
+    * `os.path`
+* Libraries I include via build scripts
+    * `
+* Libraries I've Modified:
     * `picocalc` : Minor updates to `zenodante`'s API.
+        * Fixed bugs in a bunch of utilities.
+    * `pye` : Updated from [git@github.com:robert-hh/Micropython-Editor.git](git@github.com:robert-hh/Micropython-Editor.git)
+* Libraries I'm Writing
     * `turtle.py`   : My start of a turtle API for PicoCalc.
 * Tests:
     * `picotests/drawing.py`  : Sample of `turtle` drawing calls.
     * `picotests/hardware.py` : Sample of calling PicoCalc hardware.
         * Examples:
-            * Battery state <span style="color:red">(not working yet)</span>
+            * Battery state <span style="color:green">(Requires Keyboard Driver Update)</span>
             * Screen backlight
             * Keyboard backlight
 * Tools:
@@ -20,7 +30,10 @@ I am finding embedded development to be an infuriating experience.  Thanks to th
 
 ## References:
 
+Thank you to everyone who has been adding MicroPython code for PicoCalc.
+
 * [zenodante/PicoCalc-micropython-driver](https://github.com/zenodante/PicoCalc-micropython-driver/tree/main)
+* [LofiFren/PicoCalc](https://github.com/LofiFren/PicoCalc/tree/main)
 
 ## Quickstart
 
@@ -32,14 +45,14 @@ I am finding embedded development to be an infuriating experience.  Thanks to th
     * Release button on the RP hardware
     * Your device should have a filesystem mount for the Pico hardware.
     * Drag **ONLY** the pico firmware UF2 file to this device.
-    * The device will unmount itself, likely generating an annoying error. 
+    * The device will unmount itself, likely generating an annoying error.
 * **Copy Support Scripts <u>prior</u> to booting device**
     * Disconnect and reconnect the USB-micro cable to the 2350 hardare
     * Restart the Thonny instance
     * Setup Thonny
         * Navigate to the `./lib` folder on the RP 2350 hardware
     * <span style="color:red">See Developer docs for help unti lI have mental bandwidth to correct these notes</span>
-    
+
 
 
 
@@ -50,7 +63,7 @@ I am finding embedded development to be an infuriating experience.  Thanks to th
 
 * I instead only keep the `boot.py` and `main.py` from the filesystem variant. Everything else goes into this `./lib` folder.
 
-* I have copies of the files, latest as of 6/13/2025, in my repo.  I modified them a bit, as a few minor parts if his APIs are non-functional. 
+* I have copies of the files, latest as of 6/13/2025, in my repo.  I modified them a bit, as a few minor parts if his APIs are non-functional.
 
 * <span style="color:red"><b><u>TODO: Submit PR to zenodante's repo with relvent changes!</u></b></span>
 
@@ -79,7 +92,7 @@ tree -L 1 ./workspace
 └── PicoCalc-micropython-driver
 ```
 
-### 2. Clone `PicoCalc-micropython-driver` repo into workspace folder. 
+### 2. Clone `PicoCalc-micropython-driver` repo into workspace folder.
 
 ```bash
 git clone git@github.com:zenodante/PicoCalc-micropython-driver.git
@@ -116,6 +129,7 @@ popd
 ### 6. Setup Micropython build
 
 <span style="color:red"><b><u>TODO: Cleanup Script!</u></b></span>
+
 ```bash
 pushd micropython/ports/rp2
 mkdir build
@@ -126,7 +140,7 @@ cp <repo-path>/scripts/build-micropython.sh .
 ./build-micropython
 
 # Go back to workspace folder
-```
+
 popd
 popd
 ```
@@ -148,13 +162,21 @@ os.makedirs('/lib')
 
 **Process:** Copy `./lib` to `/lib` on the Pico.
 
+### 10. Setup WebREPL Server
+
+On the device, enter the following command to setup the WebREPL server.
+
+```python
+import webrepl_setup
+```
+
 ---
 
 ## Libraries
 
 ### `turtle.py`
 
-This wraps the `picocalc` API and other tools to create a mildly functional version of turtle. 
+This wraps the `picocalc` API and other tools to create a mildly functional version of turtle.
 
 
 
@@ -163,7 +185,16 @@ This wraps the `picocalc` API and other tools to create a mildly functional vers
 
 ## Tools
 
+### Launch Status
+
+The launcher provided by the zenodante repo has been updated to print system status with the `s` key.  This includes the battery level.
+
+<center>
+ <img src='./docs/images/status.jpeg' width='75%' />
+</center>
+
 ### `browser.py`
+TODO
 
 ### `keytest.py`
 
@@ -185,7 +216,7 @@ In this example, I disabled the `p` character so it would register as unknown.  
 # Developer Notes
 
 * I'd love to know how to ditch Thonny.  I'm not very efficient with it, and I find it irritating.  Thonny has 2 huge perks I cannot find elsewhere:
-    * It has a very robust version of Micropython's PIP API.  You can install dependencies from `micropython-lib` very easily. 
+    * It has a very robust version of Micropython's PIP API.  You can install dependencies from `micropython-lib` very easily.
         * I anticipation of this, I've tried to put dependencies into this repo directly, so I can own things inside `./lib` and people won't need to use Thonny to sync.  That said, this is up to you.
     * It tends to work 100% of the time when I do the following:
         - Turn off PicoCalc hardware
@@ -193,9 +224,9 @@ In this example, I disabled the `p` character so it would register as unknown.  
         - Plug in USB-Micro cable into PicoCalc
         - Open Thonny
             - By default, my session opens to inside the "repo" folder where I transfer everything.
-        - It auto-connects and finds the PicoCalc's RP 2350 drivers 
+        - It auto-connects and finds the PicoCalc's RP 2350 drivers
             - **Note:** The PicoCalc **must** be turned off, thus the LED on the front panel of the PicoCalc is not lit.
         - You right-click on the `./lib` folder, selecting **Focus-Into**.  This sets the device's **cwd/internal** folder inside `./lib`.
-        - Select files you want to sync (first time users select everything), then **right-click**, then 
+        - Select files you want to sync (first time users select everything), then **right-click**, then
 
 ![Upload Files](./docs/images/upload.png)

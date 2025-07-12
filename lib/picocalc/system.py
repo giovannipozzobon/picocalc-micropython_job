@@ -11,13 +11,14 @@ Features various system functions such as mounting and unmounting the PicoCalc's
 
 #  Micropython Libraries
 import gc
+import logging
 import micropython
 from micropython import const
 import os
 import sdcard
 import uos
 
-
+#  PicoCalc Libraries
 import picocalc.core as pico
 from colorer import Fore, Back, Style, print, autoreset
 
@@ -102,6 +103,7 @@ def screenshot_bmp(buffer, filename, width=320, height=320, palette=None):
     file_size = FILE_HEADER_SIZE + INFO_HEADER_SIZE + PALETTE_SIZE + pixel_data_size
     pixel_data_offset = FILE_HEADER_SIZE + INFO_HEADER_SIZE + PALETTE_SIZE
 
+    logging.info( f'Writing Screenshot to {filename}' )
     with open(filename, "wb") as f:
         # BMP file header
         f.write(b'BM')
@@ -144,7 +146,7 @@ def run(filename):
     try:
         content = open(filename,'r').read()
         exec( content )
-        
+
     except OSError:
         print(f"Failed to open file: {filename}")
     except Exception as e:

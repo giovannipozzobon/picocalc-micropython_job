@@ -29,7 +29,7 @@ def ensure_nested_dir(path):
 
 
 class vt(uio.IOBase):
-    
+
 
     def __init__( self,
                   framebuf,
@@ -37,7 +37,11 @@ class vt(uio.IOBase):
                   screencaptureKey = 0x15,
                   sd = None,
                   captureFolder = "/" ): #ctrl+U for screen capture
-        
+        '''
+        Constructor
+        '''
+
+        #  SD Card Folder is required for screen-captures
         if sd != None:
             if not captureFolder.startswith("/"):
                 captureFolder = "/"+captureFolder
@@ -46,7 +50,7 @@ class vt(uio.IOBase):
                 captureFolder = captureFolder+"/"
             self.captureFolder = captureFolder
             ensure_nested_dir(self.captureFolder)
-            
+
         self.framebuf = framebuf
         self.sd = sd
         self.keyboardInput = bytearray(30)
@@ -54,7 +58,7 @@ class vt(uio.IOBase):
         vtterminal.init(self.framebuf)
         self.keyboard = keyboard
         self.screencaptureKey = screencaptureKey
-    
+
     def screencapture(self):
         if self.sd:
             filename = "{}screen_{}.raw".format(self.captureFolder, time.ticks_ms())
@@ -66,7 +70,7 @@ class vt(uio.IOBase):
     def dryBuffer(self):
         self.outputBuffer = deque((), 30)
 
-        
+
     def stopRefresh(self):
         self.framebuf.stopRefresh()
 
@@ -80,13 +84,13 @@ class vt(uio.IOBase):
             else:
                 vtterminal.printChar(ord(c))
         return len(input)
-    
-    def write(self, buf):    
+
+    def write(self, buf):
         return self.wr(buf.decode())
-    
+
     def get_screen_size(self):
         return[sc_char_height,sc_char_width]
-    
+
     def _updateInternalBuffer(self):
         s = vtterminal.read()
         if s:
@@ -98,7 +102,7 @@ class vt(uio.IOBase):
                 raise ValueError("Non-ASCII character in vtterminal.read()")
 
         n = self.keyboard.readinto(self.keyboardInput)
-        if n:          
+        if n:
             keys = bytes(self.keyboardInput[:n])
             if self.screencaptureKey in keys:
                 self.screencapture()
@@ -109,11 +113,11 @@ class vt(uio.IOBase):
             self._updateInternalBuffer()
 
         return chr(self.outputBuffer.popleft())
-        
+
 
     def rd_raw(self):
         return self.rd()
-    
+
     def readinto(self, buf):
         self._updateInternalBuffer()
         count = 0

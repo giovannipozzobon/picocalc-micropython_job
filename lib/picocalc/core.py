@@ -48,28 +48,43 @@ _StateLongPress = const(2)
 _StateRelease = const(3)
 
 class PicoDisplay(framebuf.FrameBuffer):
-    def __init__(self, width, height,color_type = framebuf.GS4_HMSB, skip_init = False):
+
+    def __init__( self,
+                  width,
+                  height,
+                  color_type = framebuf.GS4_HMSB,
+                  skip_init = False ):
+        '''
+        Init:
+        - width: Screen width in pixels
+        - height: Screen height in pixels
+        - color_type: Code responding to the color format
+        - skip_init : Flag to not initialize the underlying C++ picocalc display driver
+        '''
+
         self.width = width
         self.height = height
         self.color_type = color_type
+
+        #  Setup the buffer
         if color_type == framebuf.GS4_HMSB:
-            buffer = bytearray(self.width * self.height//2)  # 4bpp mono
+            self.buffer = bytearray(self.width * self.height//2)  # 4bpp mono
         elif color_type == framebuf.RGB565:
-            buffer = bytearray(self.width * self.height*2)
+            self.buffer = bytearray(self.width * self.height*2)
         elif color_type == framebuf.GS8:
-            buffer = bytearray(self.width * self.height)
+            self.buffer = bytearray(self.width * self.height)
         elif color_type == framebuf.GS2_HMSB:
-            buffer = bytearray(self.width * self.height//4)
+            self.buffer = bytearray(self.width * self.height//4)
         elif color_type == framebuf.MONO_HMSB:
-            buffer = bytearray(self.width * self.height//8)
+            self.buffer = bytearray(self.width * self.height//8)
 
 
-        super().__init__(buffer, self.width, self.height, color_type)
+        super().__init__(self.buffer, self.width, self.height, color_type)
         if not skip_init:
-            picocalcdisplay.init(buffer,color_type,True)
-            
+            picocalcdisplay.init(self.buffer,color_type,True)
+
     def init(self):
-        picocalcdisplay.init(buffer, self.color_type,True)
+        picocalcdisplay.init(self.buffer, self.color_type,True)
 
     def resetLUT(self):
         picocalcdisplay.resetLUT(0)
@@ -77,7 +92,7 @@ class PicoDisplay(framebuf.FrameBuffer):
     def switchPredefinedLUT(self, name='vt100'):
         if name == 'vt100':
             picocalcdisplay.resetLUT(0)
-            
+
         elif name == 'pico8':
             picocalcdisplay.resetLUT(1)
         else:
@@ -93,10 +108,10 @@ class PicoDisplay(framebuf.FrameBuffer):
 
     def stopRefresh(self):
         picocalcdisplay.stopAutoUpdate()
-    
+
     def recoverRefresh(self):
         picocalcdisplay.startAutoUpdate()
-    
+
     def text(self,c, x0, y0, color):
         picocalcdisplay.drawTxt6x8(c,x0,y0,color)
 
@@ -119,7 +134,7 @@ class PicoKeyboard:
         self.isShift = False
         self.isCtrl = False
         self.isAlt = False
-    
+
     def ignor_mod(self):
         self.ignor = True
 
@@ -131,11 +146,11 @@ class PicoKeyboard:
         self.i2c.writeto(self.address,self.temp[0:1])
         self.i2c.readfrom_into(self.address,self.temp)
         return self.temp
-    
+
     def read_reg8(self,reg):
         self.i2c.writeto(self.address, bytes(reg))
         return self.i2c.readfrom(self.address, 1)[0]
-    
+
     def write_reg(self,reg,value):
         self.temp[0]=reg| _WRITE_MASK
         self.temp[1]=value
@@ -145,19 +160,19 @@ class PicoKeyboard:
         currentCFG = self.read_reg8(_REG_CFG)
         self.temp[0]=currentCFG | (0x01<<6)
         self.write_reg(_REG_CFG,self.temp[0:1])
-    
+
     def disable_report_mods(self):
         currentCFG = self.read_reg8(_REG_CFG)
         self.temp[0]=currentCFG & (~(0x01<<6))
         self.write_reg(_REG_CFG,self.temp[0:1])
-    
+
     def enable_use_mods(self):
         currentCFG = self.read_reg8(_REG_CFG)
         self.temp[0]=currentCFG | (0x01<<7)
         self.write_reg(_REG_CFG,self.temp[0:1])
 
     def disable_use_mods(self):
-        currentCFG = self.read_reg8(_REG_CFG)   
+        currentCFG = self.read_reg8(_REG_CFG)
         self.temp[0]=currentCFG & (~(0x01<<7))
         self.write_reg(_REG_CFG,self.temp[0:1])
 
@@ -175,24 +190,24 @@ class PicoKeyboard:
         else:
             buf = self.read_reg16(_REG_FIF)
         return buf
-    
+
     def backlight(self):
         return self.read_reg8(_REG_BKL)
-    
+
     def setBacklight(self,value):
         self.write_reg(_REG_BKL,value)
 
     def backlight_keyboard(self):
         return self.read_reg8(_REG_BK2)
-    
+
     def setBacklight_keyboard(self,value):
         self.write_reg(_REG_BK2,value)
 
     def battery(self):
         return self.read_reg16(_REG_BAT)
-    
+
     def readinto(self, buf):
-        
+
         numkeysInhardware = self.keyCount()#how many keys in hardware
         if numkeysInhardware != 0:
             for i in range(numkeysInhardware):
@@ -206,7 +221,7 @@ class PicoKeyboard:
                     elif key == 0xa5:
                         self.isCtrl = True
                     elif key == 0xa1:
-                        self.isAlt = True              
+                        self.isAlt = True
                     else:
                         #check current shift/ctrl/alt state
                         modifier=b''
@@ -215,15 +230,15 @@ class PicoKeyboard:
                         elif self.isShift and self.isCtrl and (not self.isAlt):
                             modifier=b';6'
                         elif self.isAlt and self.isCtrl and (not self.isShift):
-                            modifier=b';7'    
+                            modifier=b';7'
                         elif self.isShift and self.isCtrl and self.isAlt:
-                            modifier=b';8'    
+                            modifier=b';8'
                         elif self.isAlt and (not self.isCtrl) and (not self.isShift):
-                            modifier=b';3'    
+                            modifier=b';3'
                         elif (not self.isAlt) and self.isCtrl and (not self.isShift):
-                            modifier=b';5'  
+                            modifier=b';5'
                         elif (not self.isAlt) and (not self.isCtrl) and self.isShift:
-                            modifier=b';2'  
+                            modifier=b';2'
 
                         if key >=0xB4 and key <= 0xB7:
                         #direction keys
@@ -259,7 +274,7 @@ class PicoKeyboard:
                                 if key !=ord(' ') and key!=ord(',') and key!=ord('.'):
                                     self.hardwarekeyBuf.extend(b'\x1b')#to match the vt100 terminal style
                                     self.hardwarekeyBuf.append(key)
-                            elif self.isCtrl == True:   
+                            elif self.isCtrl == True:
                                 self.hardwarekeyBuf.append(key&0x1F)
                             else:
                                 self.hardwarekeyBuf.append(key)
@@ -271,27 +286,23 @@ class PicoKeyboard:
                     elif key == 0xa1:
                         self.isAlt = False
 
-                #self.hardwarekeyBuf.append(key[:])
         #now deside how many keys to send to buf
         requestedkeys = len(buf)
         keysLeft = requestedkeys
         if len(self.hardwarekeyBuf)==0: #after read in the key, still no key in buffer
             return None
-        #print("init buf")
-        #print(buf)
-        #print("hardware key buf size")
-        #print(len(self.hardwarekeyBuf))
+
         while keysLeft > 0:
-            
+
             #fill all keys until key list is empty
             if len(self.hardwarekeyBuf)  == 0:
                 break #all keys has been read and process
-            
+
             key = self.hardwarekeyBuf.popleft()#remove the processed key from key list
             buf[-keysLeft]=key
             keysLeft -=1
-            
-        #print("read buff")   
+
+        #print("read buff")
         #print(buf)
         #print(requestedkeys-keysLeft)
         if requestedkeys-keysLeft == 0:
@@ -333,7 +344,7 @@ class PicoSD:
         """Allow the SDManager object to be called like a function to get the SDCard object."""
         if self.sd:
             return self.sd
-    
+
     def mount(self):
         """
         Mount the SD card.
@@ -407,18 +418,18 @@ class PicoSpeaker:
     def tone(self, tone, duration):
         """
         Play a tone given by a note string from NOTE_FREQUENCIES or directly as a frequency number.
-        
+
         :param tone: Either a note string ("A4", "C5", etc.) or a frequency in Hz.
         :param duration: Duration in seconds for which to play the tone.
         Written by @LaikaSpaceDawg (https://github.com/LaikaSpaceDawg/PicoCalc-micropython)
         """
         frequency = 0
-        
+
         if isinstance(tone, str) and tone.upper() in NOTE_FREQUENCIES:
             frequency = NOTE_FREQUENCIES[tone.upper()]
         elif isinstance(tone, (int, float)):
             frequency = tone
-            
+
         if frequency > 0:
             self.pwm = PWM(self.buzzer_pin)
             self.pwm.freq(frequency)
@@ -431,7 +442,7 @@ class PicoSpeaker:
     def tones(self, notes_durations):
         """
         Play a sequence of notes with their respective durations.
-        
+
         :param notes_durations: List of tuples where each tuple contains a note and its duration.
                                 e.g., [("A4", 0.5), ("C5", 0.5)]
         """
@@ -439,8 +450,8 @@ class PicoSpeaker:
             self.tone(tone, duration)
 
     def rtttl(self, text):
-        """ 
-        Convert RTTTL formatted string into frequency-duration pairs. 
+        """
+        Convert RTTTL formatted string into frequency-duration pairs.
         Provided by: @GraphicHealer (https://github.com/GraphicHealer/MicroPython-RTTTL)
         """
         try:

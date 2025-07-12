@@ -33,13 +33,11 @@ for path in paths_to_add:
         sys.path.insert(0, path)
 
 
-
-
 try:
     # Initialize basic hardware first
     pc_display = PicoDisplay(320, 320)
     pc_keyboard = PicoKeyboard()
-    
+
     # Setup debugging
     _usb = sys.stdout
     def usb_debug(msg):
@@ -49,15 +47,15 @@ try:
             _usb.write(str(msg))
         _usb.write('\r\n')
     picocalc.core.usb_debug = usb_debug
-    
+
     # Run garbage collection before SD card init
     gc.collect()
     usb_debug("Starting SD card initialization...")
-    
+
     # Mount SD card to /sd with extra delay for stability
     time.sleep_ms(900)  # Add delay before SD init
     sd = initsd(debug=True)  # Enable debug output
-    
+
     # Check if SD was initialized properly
     if sd:
         usb_debug("SD card initialized successfully")
@@ -68,30 +66,30 @@ try:
             usb_debug("WARNING: SD card capacity seems wrong")
     else:
         usb_debug("SD card initialization failed!")
-    
+
     # Give a moment for SD card to stabilize
     time.sleep_ms(900)
-    
+
     # Continue with terminal and rest of setup
     pc_terminal = vt.vt(pc_display, pc_keyboard, sd=sd)
-    
+
     picocalc.core.display  = pc_display
     picocalc.core.keyboard = pc_keyboard
     picocalc.core.terminal = pc_terminal
     picocalc.core.sd       = sd
-    
+
     def edit(*args, tab_size=2, undo=50):
         # Dry the key buffer before editing
         pc_terminal.dryBuffer()
         return pye_edit(args, tab_size=tab_size, undo=undo, io_device=pc_terminal)
     picocalc.core.edit = edit
-    
+
     os.dupterm(pc_terminal)
-    
+
     # Run the standard SD check function
     sd_status, sd_msg = checksd()
     usb_debug(f"SD check: {sd_msg}")
-    
+
     # Start main menu
     from py_run import main_menu
     main_menu()
