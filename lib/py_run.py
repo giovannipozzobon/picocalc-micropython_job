@@ -146,7 +146,7 @@ def show_system_status():
         batt_info = int.from_bytes(pc.keyboard.battery())
         batt_level = batt_info & 0x7f
         batt_charging = batt_info & 0x80 != 0
-        
+
         print("\nStorage on /sd:")
         print(f"Total: {format_bytes(total_space)}")
         print(f"Used:  {format_bytes(used_space)}")
@@ -222,10 +222,9 @@ def main_menu():
         choice = input("\nEnter choice: ").strip().lower()
 
         if choice == "x":
-            print("Exiting to prompt.")
             return
         elif choice == "r":
-            print("Reloading menu...")
+            print( 'Reloading menu...' )
             continue
         elif choice == "f":
             flush_modules()

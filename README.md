@@ -10,7 +10,7 @@ You'll notice a lot of geospatial and math stuff being added.  I use a TI Nspire
     * `logging`
     * `os.path`
 * Libraries I include via build scripts
-    * `
+    * `ulab`
 * Libraries I've Modified:
     * `picocalc` : Minor updates to `zenodante`'s API.
         * Fixed bugs in a bunch of utilities.
@@ -37,138 +37,71 @@ Thank you to everyone who has been adding MicroPython code for PicoCalc.
 
 ## Quickstart
 
+
 ### Step 1:  Copy RP2+W (2350 + Wifi) image to device
-* Per Experience, Not Documentation!
-* **Copy Base Image to Hardware:**
+1. Image is located in `./images/firmware.rp2350.wifi.uf2`
+
+2. **Copy Base Image to Hardware:**
     * Hold down reset button on the RP hardware.
     * Insert USB-Micro cable connect to your computer.
     * Release button on the RP hardware
     * Your device should have a filesystem mount for the Pico hardware.
     * Drag **ONLY** the pico firmware UF2 file to this device.
     * The device will unmount itself, likely generating an annoying error.
-* **Copy Support Scripts <u>prior</u> to booting device**
-    * Disconnect and reconnect the USB-micro cable to the 2350 hardare
-    * Restart the Thonny instance
-    * Setup Thonny
-        * Navigate to the `./lib` folder on the RP 2350 hardware
-    * <span style="color:red">See Developer docs for help unti lI have mental bandwidth to correct these notes</span>
+    * Remove the USB cable.
+
+### Step 2: Copy Support Scripts <u>prior</u> to booting device
+
+* Reconnect the USB-micro cable to the 2350 hardare
+* Restart the Thonny instance
+* Setup Thonny
+* Copy the following files.
+    * `./boot.py`
+    * `./lib/`
+
+### Step 3: Launch PicoCalc
+
+* Remove the USB-micro cable
+* Press Power button
+
+### Step 4:  Launch Status Menu
+This menu is the first thing presented to the user upon boot.
+
+* The launcher in zenodante's repo has been updated to print system status with the `s` key.
+* Exit with `x`
+
+<center>
+ <img src='./docs/images/status.jpeg' width='50%' />
+</center>
 
 
-
-
-## Pre-Setup Notes:
-
-* I chose to not use `zenodante`'s approach to compile the core APIs as frozen files.  This makes it impossible to edit them from my laptop after you setup the PicoCalc.
-    * For newbies like me, `frozen` files are Python sources you `compile` into bytecode.  This makes them exist in the filesystem, but not using the built-in filesystem.  Aka:  Consider it a *magical* filesystem.
-
-* I instead only keep the `boot.py` and `main.py` from the filesystem variant. Everything else goes into this `./lib` folder.
-
-* I have copies of the files, latest as of 6/13/2025, in my repo.  I modified them a bit, as a few minor parts if his APIs are non-functional.
-
-* <span style="color:red"><b><u>TODO: Submit PR to zenodante's repo with relvent changes!</u></b></span>
-
-
-## Setup Pico
-
-<span style="color:red"><b><u>TODO: Make these dependencies submodules</u></b></span>
-
-I duplicated the effort by doing the following steps:
-
-### 1. Create a folder to hold the workspace
-
-```bash
-mkdir workspace
-pushd workspace
-```
-
-**Note:** The final structure will look like this:
-
-```bash
-tree -L 1 ./workspace
-./workspace
-├── eigenmath_micropython
-├── micropython
-├── micropython-ulab
-└── PicoCalc-micropython-driver
-```
-
-### 2. Clone `PicoCalc-micropython-driver` repo into workspace folder.
-
-```bash
-git clone git@github.com:zenodante/PicoCalc-micropython-driver.git
-pushd PicoCalc-micropython-driver
-git remote update --init --recursive
-popd
-```
-
-### 3. Clone Micropython repo into workspace folder
-
-```bash
-git clone git@github.com:micropython/micropython.git
-pushd micropython
-git remote update --init --recursive
-popd
-```
-
-### 4. Clone Micropython-ULAB repo into workspace folder
-
-```bash
-git clone git@github.com:v923z/micropython-ulab.git
-```
-
-
-### 5. Clone Eigenmath Repo into workspace folder
-
-```bash
-git clone git@github.com:zenodante/eigenmath_micropython.git
-pushd eigenmath_micropython
-git remote update --init --recursive
-popd
-```
-
-### 6. Setup Micropython build
-
-<span style="color:red"><b><u>TODO: Cleanup Script!</u></b></span>
-
-```bash
-pushd micropython/ports/rp2
-mkdir build
-pushd build
-
-# Where you cloned this repo, where this README lives
-cp <repo-path>/scripts/build-micropython.sh .
-./build-micropython
-
-# Go back to workspace folder
-
-popd
-popd
-```
-
-### 7. Connect Pico 2W to Thonny
-
-### 8. Create /lib folder
-
-On the terminal, run the following shell command on the repl:
+## Step 5: Setup WiFi and Web-REPL
 
 ```python
-import os
-os.makedirs('/lib')
-```
+import picocalc.wifi as wifi
+wifi.init().scan()
 
-### 9. Copy Project files
-
-**Note:** I have the Micropython `logging` and `os-path` sources already added to this folder.   You can skip this if you want ot use Micropython's PIP API in Thonny instead.
-
-**Process:** Copy `./lib` to `/lib` on the Pico.
-
-### 10. Setup WebREPL Server
-
-On the device, enter the following command to setup the WebREPL server.
-
-```python
+#  Find your wifi in the printout
+wifi.init().connect( ssid_str, password_str )
 import webrepl_setup
 ```
+**Note:** your password and ssid should be saved to disk.
+
+Now, to setup the Web-REPL, do the following:
+```python
+picocalc.wifi.webrepl()
+```
+
+Now, you can connect to the PicoCalc's terminal without having to use a USB cable.
+<center>
+ <img src='./docs/images/webrepl.png' width='75%' />
+</center>
+
+---
+
+## Building the Micropython Image
+
+See [this README](./docs/setup.md) for building and configuration of the MicroPython image.
 
 ---
 
@@ -179,19 +112,9 @@ import webrepl_setup
 This wraps the `picocalc` API and other tools to create a mildly functional version of turtle.
 
 
-
-
 ---
 
 ## Tools
-
-### Launch Status
-
-The launcher provided by the zenodante repo has been updated to print system status with the `s` key.  This includes the battery level.
-
-<center>
- <img src='./docs/images/status.jpeg' width='75%' />
-</center>
 
 ### `browser.py`
 TODO
@@ -212,6 +135,12 @@ In this example, I disabled the `p` character so it would register as unknown.  
 </center>
 
 <span style="color:red"><b><u>TODO:</u></b></span> Use the turtle display API to allow taking screenshots.
+
+# Tasks / Todo
+
+* [ ] - Add Wifi status to launch script.
+* [ ] - Update launch script to test/verify/fix bugs in other features.
+
 
 # Developer Notes
 

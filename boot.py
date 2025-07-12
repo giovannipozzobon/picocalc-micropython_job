@@ -16,8 +16,6 @@ from flush import flush
 from pye import pye_edit
 import vt
 
-print('Importing PicoCalc')
-
 #  PicoCalc
 import picocalc
 from picocalc.core import PicoDisplay, PicoKeyboard
@@ -93,6 +91,8 @@ try:
     # Start main menu
     from py_run import main_menu
     main_menu()
+
+    usb_debug( 'Finished Main Menu' )
 
 except Exception as e:
     import sys

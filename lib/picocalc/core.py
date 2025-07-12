@@ -22,6 +22,7 @@ keyboard, display = None, None
 terminal = None
 edit = None
 usb_debug = None
+wlan = None
 
 _REG_VER = const(0x01) # fw version
 _REG_CFG = const(0x02) # config
