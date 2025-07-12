@@ -27,7 +27,7 @@ autoreset(True)
 def human_readable_size(size):
     """
     Returns input size in bytes in a human-readable format
-    
+
     Inputs: size in bytes
     Outputs: size in closest human-readable unit
     """
@@ -42,7 +42,7 @@ def is_dir(path):
     """
     Helper function to shittily replace os.path.exists (not in micropython)
     Absolutely not a good replacement, but decent enough for seeing if the SD is mounted
-    
+
     Inputs: path to check for
     Outputs: boolean if path is found
     """
@@ -137,12 +137,14 @@ def run(filename):
     """
     Simple run utility.
     Attempts to run python file provided by filename, returns when done.
-    
-    Inputs: python file filename/filepath 
+
+    Inputs: python file filename/filepath
     Outputs: None, runs file
     """
     try:
-        exec(open(filename).read(), globals())
+        content = open(filename,'r').read()
+        exec( content )
+        
     except OSError:
         print(f"Failed to open file: {filename}")
     except Exception as e:
@@ -152,7 +154,7 @@ def run(filename):
 def files(directory="/"):
     """
     Basic ls port.
-    
+
     Inputs: directory/filepath to list files and directories in
     Outputs: Print of all files and directories contained, along with size
     """
@@ -189,17 +191,17 @@ def memory():
 
     # Total memory is the sum of free and allocated memory
     total_memory = free_memory + allocated_memory
-    
+
     human_readable_total = human_readable_size(total_memory)
     human_readable_free = human_readable_size(free_memory)
-    
+
     print(f"Total RAM: {human_readable_total}")
     print(f"Free RAM: {human_readable_free}")
 
 def disk():
     """
     Prints available flash and SD card space (if mounted) as well as totals
-    
+
     Input: None
     Outputs: None, prints disk statuses
     """
@@ -233,18 +235,18 @@ def disk():
         else:
             if path == '/sd':
                 print("No SD Card Mounted.")
-    
+
 def initsd():
     """
     SD Card mounting utility for PicoCalc.
     Utility is specifically for the PicoCalc's internal SD card reader, as it is tuned for its pins.
-    
+
     Inputs: None
     Outputs: None (Mounts SD card if it is present)
     """
     def list_dir(path, indent=0):
         ignore = [".Spotlight-V100", ".Trashes"]
-        
+
         try:
             entries = os.listdir(path)
         except OSError as e:
@@ -278,7 +280,7 @@ def killsd(sd_mnt="/sd"):
     """
     SD Card unmounting utility for PicoCalc.
     Could technically function on any device with uos, since it uses the mount point.
-    
+
     Inputs: Filepath to SD mount point
     Output: None, unmounts SD
     """
@@ -286,7 +288,7 @@ def killsd(sd_mnt="/sd"):
         try:
             uos.umount(sd_mnt)
             pico.sd = None
-        except Exception as e: 
+        except Exception as e:
             print(f"Failed to unmount SD card: {e}")
     return
 

@@ -75,6 +75,7 @@ tree -L 1 ./workspace
 ./workspace
 ├── eigenmath_micropython
 ├── micropython
+├── micropython-ulab
 └── PicoCalc-micropython-driver
 ```
 
@@ -96,7 +97,14 @@ git remote update --init --recursive
 popd
 ```
 
-### 4. Clone Eigenmath Repo into workspace folder
+### 4. Clone Micropython-ULAB repo into workspace folder
+
+```bash
+git clone git@github.com:v923z/micropython-ulab.git
+```
+
+
+### 5. Clone Eigenmath Repo into workspace folder
 
 ```bash
 git clone git@github.com:zenodante/eigenmath_micropython.git
@@ -105,7 +113,7 @@ git remote update --init --recursive
 popd
 ```
 
-### 5. Setup Micropython build
+### 6. Setup Micropython build
 
 <span style="color:red"><b><u>TODO: Cleanup Script!</u></b></span>
 ```bash
@@ -118,14 +126,14 @@ cp <repo-path>/scripts/build-micropython.sh .
 ./build-micropython
 
 # Go back to workspace folder
+```
 popd
 popd
-
 ```
 
-### 6. Connect Pico 2W to Thonny
+### 7. Connect Pico 2W to Thonny
 
-### 7. Create /lib folder
+### 8. Create /lib folder
 
 On the terminal, run the following shell command on the repl:
 
@@ -134,7 +142,7 @@ import os
 os.makedirs('/lib')
 ```
 
-### 8. Copy Project files
+### 9. Copy Project files
 
 **Note:** I have the Micropython `logging` and `os-path` sources already added to this folder.   You can skip this if you want ot use Micropython's PIP API in Thonny instead.
 
