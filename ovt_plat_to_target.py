@@ -58,8 +58,9 @@ def launch():
 
 if __name__ == '__main__':
     try:
-        logging.info( 'Start of application' )
+        logging.basicConfig( level = logging.INFO )
+
+        logging.debug( 'Start of application' )
         launch()
     except Exception as e:
         print( f'error occurred: {e}' )
-

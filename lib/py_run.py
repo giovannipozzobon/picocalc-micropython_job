@@ -14,7 +14,7 @@ def find_py_files( base_path = "/sd" ):
     '''
 
     if os.path.exists( base_path ) == False:
-        logging.warning( '{base_path} does not exist.'.format(base_path) )
+        logging.warning( f'{base_path} does not exist.' )
         return []
 
     py_files = []

@@ -8,14 +8,14 @@ from ulab import numpy as np
 def rotation_matrix( axes   : str,
                      angles : list,
                      degrees: bool = False,
-                     dims   : tuple = (4,4) ):
+                     dims   : int = 4 ):
     """
     Construct a rotation matrix
     """
-    
+
     if len(axes) != len(angles):
         raise Exception( f'Length of axis list and angle list must be equal. {len(axes)} vs {len(angles)}' )
-    
+
     mat = None
     for x in range( len( axes ) ):
 
@@ -26,7 +26,7 @@ def rotation_matrix( axes   : str,
         if degrees:
             angle = math.radians( angle )
 
-        tmp = np.eye( dims, dtype = float )
+        tmp = np.eye( dims, dtype = np.float )
 
         if axis == 'x':
 

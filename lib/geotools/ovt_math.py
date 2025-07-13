@@ -6,8 +6,7 @@ import math
 from ulab import numpy as np
 
 #  Geotools Libraries
-from geotools.spatial import enu_to_ned_matrix,
-                             rotation_matrix
+from geotools.spatial import enu_to_ned_matrix, rotation_matrix
 
 #  Platform to NED
 def platform_to_ned( platform_vec : np.array,
