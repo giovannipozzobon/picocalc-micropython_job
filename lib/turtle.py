@@ -151,11 +151,11 @@ class Key:
         return value
 
 #  This provides a mapping between each key, and the ioctl values
-#  which map.  Some of these are straight ASCII, whereas others are 
-#  more complex. 
-KEYMAP = { Key.UNKNOWN       : (   0, ) ,                
-           Key.TAB           : (   9, ) ,                
-           Key.ENTER         : (  13, ) ,                
+#  which map.  Some of these are straight ASCII, whereas others are
+#  more complex.
+KEYMAP = { Key.UNKNOWN       : (   0, ) ,
+           Key.TAB           : (   9, ) ,
+           Key.ENTER         : (  13, ) ,
            Key.ESCAPE        : (  27,  27 ) ,             # Key:  Escape key
            Key.INSERT        : (  27,  73 ) ,             # Key:  Insert
            Key.DELETE        : (  27,  91,  51, 126 ) ,   # Key:  Delete
@@ -180,24 +180,24 @@ KEYMAP = { Key.UNKNOWN       : (   0, ) ,
            Key.COMMA         : (  44, ) ,                # Key:  ,   (Comma)
            Key.MINUS         : (  45, ) ,                # Key:  -   (Minus)
            Key.PERIOD        : (  46, ) ,                # Key:  .   (Period)
-           Key.SLASH         : (  47, ) ,                # Key: 
-           Key.DIGIT_1       : (  49, ) ,                # Key: 
-           Key.DIGIT_0       : (  48, ) ,                # Key: 
-           Key.DIGIT_2       : (  50, ) ,                # Key: 
-           Key.DIGIT_3       : (  51, ) ,                # Key: 
-           Key.DIGIT_4       : (  52, ) ,                # Key: 
-           Key.DIGIT_5       : (  53, ) ,                # Key: 
-           Key.DIGIT_6       : (  54, ) ,                # Key: 
-           Key.DIGIT_7       : (  55, ) ,                # Key: 
-           Key.DIGIT_8       : (  56, ) ,                # Key: 
-           Key.DIGIT_9       : (  57, ) ,                # Key: 
-           Key.COLON         : (  58, ) ,                # Key: 
-           Key.SEMICOLON     : (  59, ) ,                # Key: 
+           Key.SLASH         : (  47, ) ,                # Key:
+           Key.DIGIT_1       : (  49, ) ,                # Key:
+           Key.DIGIT_0       : (  48, ) ,                # Key:
+           Key.DIGIT_2       : (  50, ) ,                # Key:
+           Key.DIGIT_3       : (  51, ) ,                # Key:
+           Key.DIGIT_4       : (  52, ) ,                # Key:
+           Key.DIGIT_5       : (  53, ) ,                # Key:
+           Key.DIGIT_6       : (  54, ) ,                # Key:
+           Key.DIGIT_7       : (  55, ) ,                # Key:
+           Key.DIGIT_8       : (  56, ) ,                # Key:
+           Key.DIGIT_9       : (  57, ) ,                # Key:
+           Key.COLON         : (  58, ) ,                # Key:
+           Key.SEMICOLON     : (  59, ) ,                # Key:
            Key.LESS_THAN     : (  60, ) ,                # Key:  < (Left Angle-Bracket)
            Key.EQUAL         : (  61, ) ,                # Key:  = (Equal Sign)
            Key.GREATER_THAN  : (  62, ) ,                # Key:  > (Right Angle-Bracket)
-           Key.QUESTION      : (  63, ) ,                # Key: 
-           Key.AT            : (  64, ) ,                # Key: 
+           Key.QUESTION      : (  63, ) ,                # Key:
+           Key.AT            : (  64, ) ,                # Key:
            Key.A_UPPER       : (  65, ) ,
            Key.B_UPPER       : (  66, ) ,
            Key.C_UPPER       : (  67, ) ,
@@ -224,12 +224,12 @@ KEYMAP = { Key.UNKNOWN       : (   0, ) ,
            Key.X_UPPER       : (  88, ) ,
            Key.Y_UPPER       : (  89, ) ,
            Key.Z_UPPER       : (  90, ) ,
-           Key.LEFT_BRACKET  : (  91, ) ,                # Key: 
-           Key.BACKSLASH     : (  92, ) ,                # Key: 
+           Key.LEFT_BRACKET  : (  91, ) ,                # Key:
+           Key.BACKSLASH     : (  92, ) ,                # Key:
            Key.RIGHT_BRACKET : (  93, ) ,                # Key: ] (Right-Bracket)
            Key.CARROT        : (  94, ) ,                # Key: ^ (Carrot)
-           Key.UNDERSCORE    : (  95, ) ,                # Key: 
-           Key.TICK          : (  96, ) ,                # Key: 
+           Key.UNDERSCORE    : (  95, ) ,                # Key:
+           Key.TICK          : (  96, ) ,                # Key:
            Key.A_LOWER       : (  97, ) ,
            Key.B_LOWER       : (  98, ) ,
            Key.C_LOWER       : (  99, ) ,
@@ -257,22 +257,22 @@ KEYMAP = { Key.UNKNOWN       : (   0, ) ,
            Key.Y_LOWER       : ( 121, ) ,
            Key.Z_LOWER       : ( 122, ) ,
            Key.LEFT_BRACE    : ( 123, ) ,                # Key: { (Left-Squigly-Brace)
-           Key.PIPE          : ( 124, ) ,                # Key: 
-           Key.RIGHT_BRACE   : ( 125, ) ,                # Key: 
-           Key.TILDE         : ( 126, ) ,                # Key: 
-           Key.BACKSPACE     : ( 127, ) ,                # Key: 
-           Key.F1            : ( 129, ) ,                # Key: 
-           Key.F2            : ( 130, ) ,                # Key: 
-           Key.F3            : ( 131, ) ,                # Key: 
-           Key.F4            : ( 132, ) ,                # Key: 
-           Key.F5            : ( 133, ) ,                # Key: 
-           Key.F6            : ( 134, ) ,                # Key: 
-           Key.F7            : ( 135, ) ,                # Key: 
-           Key.F8            : ( 136, ) ,                # Key: 
-           Key.F9            : ( 137, ) ,                # Key: 
-           Key.F10           : ( 144, ) ,                # Key: 
-           Key.CAPS_LOCK     : ( 193, ) ,                # Key: 
-           Key.BREAK         : ( 208, )                  # Key: 
+           Key.PIPE          : ( 124, ) ,                # Key:
+           Key.RIGHT_BRACE   : ( 125, ) ,                # Key:
+           Key.TILDE         : ( 126, ) ,                # Key:
+           Key.BACKSPACE     : ( 127, ) ,                # Key:
+           Key.F1            : ( 129, ) ,                # Key:
+           Key.F2            : ( 130, ) ,                # Key:
+           Key.F3            : ( 131, ) ,                # Key:
+           Key.F4            : ( 132, ) ,                # Key:
+           Key.F5            : ( 133, ) ,                # Key:
+           Key.F6            : ( 134, ) ,                # Key:
+           Key.F7            : ( 135, ) ,                # Key:
+           Key.F8            : ( 136, ) ,                # Key:
+           Key.F9            : ( 137, ) ,                # Key:
+           Key.F10           : ( 144, ) ,                # Key:
+           Key.CAPS_LOCK     : ( 193, ) ,                # Key:
+           Key.BREAK         : ( 208, )                  # Key:
 }
 
 class Keyboard:
@@ -283,15 +283,15 @@ class Keyboard:
     @staticmethod
     def is_lowercase_letter( key ):
         return key >= 97 and key <= 122
-    
+
     @staticmethod
     def is_uppercase_letter( key ):
         return key >= 65 and key <= 90
-    
+
     @staticmethod
     def is_number( key ):
         return key >= 48 and key <= 57
-    
+
 
     @staticmethod
     def is_letter( key ):
@@ -339,7 +339,7 @@ class Keyboard:
             #  Convert to tuple so we can compare against KEYMAP
             temp = tuple(current)
 
-            #  Check value            
+            #  Check value
             key = Keyboard.get_char( temp )
 
             if key is None:
@@ -360,7 +360,7 @@ class TurtleScreen:
         '''
         This was lifted from the refresh.py example.
         Basically, put things back the way we found them.
-        
+
         @todo:  Actually capture original values from init calls
                 so it's actually a reset call.
         '''
@@ -429,7 +429,7 @@ def check_keyboard( verbose = False ):
     temp = bytearray(1)
     while keyboard.readinto(temp):
         output.append( temp[0] )
-    
+
     #  Log keyboard input
     if verbose:
         print( 'Keys Read: ', output )

@@ -1,7 +1,7 @@
 
 import math
 
-import geotools.ndarray as np
+from ulab import numpy as np
 
 class Quaternion:
 
@@ -35,6 +35,8 @@ class Quaternion:
     output = Quaternion()
     output.real = self.real * other.real - self.imag  * other.imag
     output.imag = self.real * other.imag + other.real * self.imag + np.cross( self.imag, other.imag )
+
+    return output
 
   @staticmethod
   def from_angle_axis( theta, vec, degrees = False ):

@@ -6,60 +6,70 @@ import network
 import socket
 import time
 
+#  Logger Setup
+logging.basicConfig( level = logging.INFO )
+
 #  Global Variable to store WLAN Instance
 wifi = None
 
 class Wifi_Manager:
 
     def __init__( self ):
+        
+        #  Setup Internal Logger
         self.logger = logging.getLogger('Wifi_Manager')
         self.logger.setLevel( logging.INFO )
+        
+        #  Create a new WLAN instance
         self.wlan   = network.WLAN( network.STA_IF )
 
 
-    def save_file( self, ssid, password ):
+    def save_file( self, ssid, password, pathname = 'wifi.json' ):
         '''Save WiFi credentials to a file'''
+        
         config = {
             "ssid": ssid,
             "password": password
         }
-        with open('wifi.json', 'w') as f:
+        with open(pathname, 'w') as f:
             json.dump(config, f)
 
-        print( f"Saved credentials for {ssid}" )
+        print( f"Saved credentials for {ssid} to {pathname}" )
 
-    def load_file(self):
+    def load_file(self, pathname = 'wifi.json' ):
         '''
         Load WiFi Credentials from File
         '''
         try:
-            with open('wifi.json', 'r') as f:
+            with open( pathname, 'r') as f:
                 config = json.load(f)
                 return config.get( 'ssid', '' ), config.get( 'password', '' )
         except:
             return '',''
 
-    def connect( self, ssid = None, password = None ):
+    def connect( self, ssid = None, password = None, pathname = 'wifi.json' ):
         '''Connect to WiFi with given or saved credentials'''
 
         # If no credentials provided, try to load saved ones
         if not ssid or not password:
-            ssid, password = self.load_file()
+            ssid, password = self.load_file( pathname )
             if not ssid or not password:
-                print("No WiFi credentials found!")
-                print("Usage: brad.connect('your_ssid', 'your_password')")
+                self.logger.error( f'No WiFi credentials found!\nUsage: wifi.connect("your_ssid", "your_password")')
                 return None
+            
         else:
             # Save the credentials for future use
-            self.save_file(ssid, password)
+            self.save_file( ssid, password, pathname )
 
         # Check if already connected
         if self.wlan.isconnected():
-            print( f'Already connected to {ssid}' )
-            print( f'IP: {self.wlan.ifconfig()[0]}' )
+            
+            message = f'Already connected to {ssid}\nIP: {self.wlan.ifconfig()[0]}'
+            self.logger.warning( message )
+            
             return self.wlan
 
-        print(f"Connecting to {ssid}...")
+        self.logger.info(f"Connecting to {ssid}...")
         self.wlan.connect(ssid, password)
 
         # Wait for connection with timeout
@@ -92,7 +102,7 @@ class Wifi_Manager:
             output += f'IP address  : {ip}\n'
             output += f'Gateway     : {gateway}\n'
             output += f'DNS         : {dns}\n'
-            print(output)
+            logging.info(output)
 
             return True
         else:
@@ -157,21 +167,27 @@ def init():
         wifi = Wifi_Manager()
         wifi.wlan.active(True)
         wifi.logger.info("Scanning for networks...")
+        wifi.scan()
 
     return wifi
 
-def webrepl():
-    
+def webrepl( ssid = None, password = None ):
+    '''
+    Launch the Web-Based Read-Eval-Print-Loop server.
+    The SSID and Password are provided as inputs if the user has never connected
+    and saved their credentials before.
+    '''
     global wifi
     
     wifi = init()
     if wifi.status():
-        print( wifi.status() )
+        pass
     else:
-        wifi.connect()
+        wifi.connect( ssid, password )
         if wifi.status() == False:
             raise Exception('Could not connect to wifi')
     
     #  Setup WebREPL
     import webrepl
+    wifi.logger.info( 'Launching Web-REPL' )
     webrepl.start()

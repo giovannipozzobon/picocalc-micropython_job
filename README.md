@@ -7,8 +7,11 @@ You'll notice a lot of geospatial and math stuff being added.  I use a TI Nspire
 ## Features
 
 * Libraries I've Added from MicroPython Package Manager
+    * `datetime`
     * `logging`
     * `os.path`
+* Libraries I've added from thirdparty sources:
+    * `ustrftime` from [iyassou/ustrftime](https://github.com/iyassou/ustrftime/blob/main/ustrftime.py).
 * Libraries I include via build scripts
     * `ulab`
 * Libraries I've Modified:
@@ -33,7 +36,14 @@ You'll notice a lot of geospatial and math stuff being added.  I use a TI Nspire
 Thank you to everyone who has been adding MicroPython code for PicoCalc.
 
 * [zenodante/PicoCalc-micropython-driver](https://github.com/zenodante/PicoCalc-micropython-driver/tree/main)
+    * Display drivers, core workflow, and tools were derived from this repo.
 * [LofiFren/PicoCalc](https://github.com/LofiFren/PicoCalc/tree/main)
+    * Much of the support scripts are based on random tools compiled in this repo.
+* [eudoxos/pico-st7789-driver-lvgl](https://github.com/eudoxos/pico-st7789-driver-lvgl/tree/918620b9a821bcce1780156a0a75d4c58a6f8ca9)
+    * Providing most of the reference on how to add MicroPython display drivers using Micropython.
+* [iyassou/ustrftime](https://github.com/iyassou/ustrftime/tree/main)
+    * Provides an analog to Python's `time.strftime()` function.
+
 
 ## Quickstart
 
@@ -57,6 +67,7 @@ Thank you to everyone who has been adding MicroPython code for PicoCalc.
 * Setup Thonny
 * Copy the following files.
     * `./boot.py`
+    * `./sd_chk.py` - <span style="color:red">TODO: Move me!!!</span>
     * `./lib/`
 
 ### Step 3: Launch PicoCalc
@@ -138,8 +149,16 @@ In this example, I disabled the `p` character so it would register as unknown.  
 
 # Tasks / Todo
 
+* [ ] - Move `sd_chk.py` to `./lib/`
 * [ ] - Add Wifi status to launch script.
 * [ ] - Update launch script to test/verify/fix bugs in other features.
+
+
+#  Known Issues
+
+* The Pico RP 2350 2W locks up for pretty much any reason.  It is heinously unstable.
+
+* I'm struggling to get my webrepl server stable.  It likes to crash for pretty much any reason.  I need to work out a reliable sequence.
 
 
 # Developer Notes

@@ -1,7 +1,16 @@
+
+#  Micropython Libraries
 from micropython import const
 import io
 import sys
 import time
+
+#  Supported Libraries
+try:
+    import ustrftime
+except Exception:
+    pass
+
 
 CRITICAL = const(50)
 ERROR = const(40)
@@ -23,12 +32,15 @@ _level_dict = {
 
 _loggers = {}
 _stream = sys.stderr
-_default_fmt = "%(levelname)s:%(name)s:%(message)s"
-_default_datefmt = "%Y-%m-%d %H:%M:%S"
-
+_default_fmt = "[%(asctime)s] [%(levelname)s] : %(name)s: : %(message)s"
+#_default_datefmt = "%x %X"
+_default_datefmt = "%X"  # Using just time since the small screen
 
 class LogRecord:
+    
     def set(self, name, level, message):
+        
+        global _level_dict
         self.name = name
         self.levelno = level
         self.levelname = _level_dict[level]
@@ -37,6 +49,9 @@ class LogRecord:
         self.msecs = int((self.ct - int(self.ct)) * 1000)
         self.asctime = None
 
+    def __str__( self ):
+        return f'{self.name},{self.levelno},{self.levelname},{self.message},{self.ct},{self.msecs},{self.asctime}'
+    
 
 class Handler:
     def __init__(self, level=NOTSET):
@@ -58,6 +73,9 @@ class Handler:
 
 class StreamHandler(Handler):
     def __init__(self, stream=None):
+        
+        global _stream
+        
         super().__init__()
         self.stream = _stream if stream is None else stream
         self.terminator = "\n"
@@ -67,13 +85,18 @@ class StreamHandler(Handler):
             self.stream.flush()
 
     def emit(self, record):
+        
         if record.levelno >= self.level:
             self.stream.write(self.format(record) + self.terminator)
 
 
 class FileHandler(StreamHandler):
+    
     def __init__(self, filename, mode="a", encoding="UTF-8"):
-        super().__init__(stream=open(filename, mode=mode, encoding=encoding))
+        
+        super().__init__( stream=open( filename,
+                                       mode     = mode,
+                                       encoding = encoding))
 
     def close(self):
         super().close()
@@ -82,15 +105,26 @@ class FileHandler(StreamHandler):
 
 class Formatter:
     def __init__(self, fmt=None, datefmt=None):
-        self.fmt = _default_fmt if fmt is None else fmt
+        
+        #  This is necessary in Micropython, at least with 1.26
+        global _default_fmt
+        global _default_datefmt
+        
+        self.fmt     = _default_fmt if fmt is None else fmt
         self.datefmt = _default_datefmt if datefmt is None else datefmt
 
     def usesTime(self):
         return "asctime" in self.fmt
 
     def formatTime(self, datefmt, record):
+        '''Format the internal time'''
+        
         if hasattr(time, "strftime"):
             return time.strftime(datefmt, time.localtime(record.ct))
+        
+        if 'ustrftime' in sys.modules.keys():
+            return ustrftime.strftime( datefmt, time.localtime(record.ct) )
+        
         return None
 
     def format(self, record):
@@ -122,13 +156,19 @@ class Logger:
         return self.level or getLogger().level or _DEFAULT_LEVEL
 
     def log(self, level, msg, *args):
+        '''
+        Primary function to send a log message to the stream writer.
+        '''
         if self.isEnabledFor(level):
             if args:
                 if isinstance(args[0], dict):
                     args = args[0]
                 msg = msg % args
+            
             self.record.set(self.name, level, msg)
+            
             handlers = self.handlers
+            
             if not handlers:
                 handlers = getLogger().handlers
             for h in handlers:
@@ -168,13 +208,22 @@ class Logger:
         return len(self.handlers) > 0
 
 
-def getLogger(name=None):
+def getLogger( name = None ):
+    '''
+    Acquire a specific Logger instance.  If no name is specified the "root" logger is returned.
+    '''
+    
+    global _loggers
+    
     if name is None:
         name = "root"
-    if name not in _loggers:
+        
+    if name not in _loggers.keys():
         _loggers[name] = Logger(name)
+        
         if name == "root":
             basicConfig()
+            
     return _loggers[name]
 
 
@@ -207,6 +256,7 @@ def exception(msg, *args, exc_info=True):
 
 
 def shutdown():
+    global _loggers
     for k, logger in _loggers.items():
         for h in logger.handlers:
             h.close()
@@ -227,6 +277,8 @@ def basicConfig(
     encoding="UTF-8",
     force=False,
 ):
+    global _loggers
+    
     if "root" not in _loggers:
         _loggers["root"] = Logger("root")
 
