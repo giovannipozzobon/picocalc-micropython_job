@@ -1,39 +1,64 @@
-# datetime.py
+#**************************** INTELLECTUAL PROPERTY RIGHTS ****************************#
+#*                                                                                    *#
+#*                           Copyright (c) 2025 Terminus LLC                          *#
+#*                                                                                    *#
+#*                                All Rights Reserved.                                *#
+#*                                                                                    *#
+#*          Use of this source code is governed by LICENSE in the repo root.          *#
+#*                                                                                    *#
+#**************************** INTELLECTUAL PROPERTY RIGHTS ****************************#
+#
+#  Note to Users:  Micropython's time library skips a bit.  The time2 API tries to rectify this
+#  as much as possible.
+#
 
-import time as _tmod
+#  Python Libraries
+import time as _time
 
-__version__ = "2.0.0"
+#  Project Libraries
+import time2 as _time2
 
-_DBM = (0, 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334)
-_DIM = (0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
+#  Global Values
+MINYEAR = 1
+MAXYEAR = 9999
+
+#  List of Timezones
+TZ_MST = 0
+TZ_MDT = 1
+TZ_PST = 2
+TZ_PDT = 3
+
+TIMEZONES = { TZ_MST: -7,
+              TZ_MDT: -6,
+              TZ_PST: -8,
+              TZ_PDT: -7 }
+
+def set_timezone_offset( hours ):
+
+    if isinstance( hours, int ):
+        _time2.set_timezone_offset( hours )
+    else:
+        _time2.set_timezone_offset( TIMEZONES[hours] )
+
+DAYS_BEFORE_MONTH = (0, 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334)
+
 _TIME_SPEC = ("auto", "hours", "minutes", "seconds", "milliseconds", "microseconds")
 
 
-def _leap(y):
-    return y % 4 == 0 and (y % 100 != 0 or y % 400 == 0)
-
-
-def _dby(y):
+def days_before_year(y):
     # year -> number of days before January 1st of year.
     Y = y - 1
     return Y * 365 + Y // 4 - Y // 100 + Y // 400
 
 
-def _dim(y, m):
-    # year, month -> number of days in that month in that year.
-    if m == 2 and _leap(y):
-        return 29
-    return _DIM[m]
-
-
-def _dbm(y, m):
+def days_before_month(y, m):
     # year, month -> number of days in year preceding first day of month.
-    return _DBM[m] + (m > 2 and _leap(y))
+    return DAYS_BEFORE_MONTH[m] + (m > 2 and _time2.is_leap_year(y))
 
 
-def _ymd2o(y, m, d):
+def ymd_to_days_before_utc_epoch(y, m, d):
     # y, month, day -> ordinal, considering 01-Jan-0001 as day 1.
-    return _dby(y) + _dbm(y, m) + d
+    return days_before_year(y) + days_before_month(y, m) + d
 
 
 def _o2ymd(n):
@@ -48,16 +73,15 @@ def _o2ymd(n):
     if n1 == 4 or n100 == 4:
         return y - 1, 12, 31
     m = (n + 50) >> 5
-    prec = _dbm(y, m)
+    prec = days_before_month(y, m)
     if prec > n:
         m -= 1
-        prec -= _dim(y, m)
+        prec -= _time2.days_in_month(y, m)
     n -= prec
     return y, m, n + 1
 
 
-MINYEAR = 1
-MAXYEAR = 9_999
+
 
 
 class timedelta:
@@ -171,7 +195,7 @@ class timedelta:
             spec &= ~0x40
             hr = str(h)
         else:
-            hr = f"{h:02d}"
+            hr = "{:02d}".format(h)
         if spec & 0x20:
             spec &= ~0x20
             spec |= 0x10
@@ -182,20 +206,20 @@ class timedelta:
                 g = "+"
         if d:
             p = "s" if d > 1 else ""
-            r += f"{g}{d} day{p}, "
+            r += "{}{} day{}, ".format(g,d,p)
             g = ""
         if spec == 0:
             spec = 5 if (ms or us) else 3
         if spec >= 1 or h:
-            r += f"{g}{hr}"
+            r += "{}{}".format(g,hr)
             if spec >= 2 or m:
-                r += f":{m:02d}"
+                r += ":{:02d}".format(m)
                 if spec >= 3 or s:
-                    r += f":{s:02d}"
+                    r += ":{:02d}".format(s)
                     if spec >= 4 or ms:
-                        r += f".{ms:03d}"
+                        r += ".{:03d}".format(ms)
                         if spec >= 5 or us:
-                            r += f"{us:03d}"
+                            r += "{:03d}".format(us)
         return r
 
     def tuple(self):
@@ -283,26 +307,25 @@ class timezone(tzinfo):
     def fromutc(self, dt):
         return dt + self._offset
 
-
 timezone.utc = timezone(timedelta(0))
 
-
 def _date(y, m, d):
-    if MINYEAR <= y <= MAXYEAR and 1 <= m <= 12 and 1 <= d <= _dim(y, m):
-        return _ymd2o(y, m, d)
+
+    if MINYEAR <= y <= MAXYEAR and 1 <= m <= 12 and 1 <= d <= _time2.days_in_month(y, m):
+        return ymd_to_days_before_utc_epoch(y, m, d)
     elif y == 0 and m == 0 and 1 <= d <= 3_652_059:
         return d
     else:
-        raise ValueError
+        raise ValueError( 'Date requested is invalid. Y: {}, M: {}, D: {}'.format(y,m,d) )
 
 
-def _iso2d(s):  # ISO -> date
+def iso_to_date(s):  # ISO -> date
     if len(s) < 10 or s[4] != "-" or s[7] != "-":
         raise ValueError
     return int(s[0:4]), int(s[5:7]), int(s[8:10])
 
 
-def _d2iso(o):  # date -> ISO
+def date_to_iso(o):  # date -> ISO
     return "%04d-%02d-%02d" % _o2ymd(o)
 
 
@@ -312,11 +335,11 @@ class date:
 
     @classmethod
     def fromtimestamp(cls, ts):
-        return cls(*_tmod.localtime(ts)[:3])
+        return cls(*_time.localtime(ts)[:3])
 
     @classmethod
     def today(cls):
-        return cls(*_tmod.localtime()[:3])
+        return cls(*_time.localtime()[:3])
 
     @classmethod
     def fromordinal(cls, n):
@@ -343,7 +366,7 @@ class date:
 
     def timetuple(self):
         y, m, d = self.tuple()
-        yday = _dbm(y, m) + d
+        yday = days_before_month(y, m) + d
         return (y, m, d, 0, 0, 0, self.weekday(), yday, -1)
 
     def replace(self, year=None, month=None, day=None):
@@ -390,7 +413,7 @@ class date:
         return self._ord % 7 or 7
 
     def isoformat(self):
-        return _d2iso(self._ord)
+        return date_to_iso(self._ord)
 
     def __repr__(self):
         return "datetime.date(0, 0, {})".format(self._ord)
@@ -405,9 +428,9 @@ class date:
     def tuple(self):
         return _o2ymd(self._ord)
 
-
-date.min = date(MINYEAR, 1, 1)
-date.max = date(MAXYEAR, 12, 31)
+#  Define some explicit date ranges
+date.min = date( MINYEAR, 1, 1 )
+date.max = date( MAXYEAR, 12, 31 )
 date.resolution = timedelta(days=1)
 
 
@@ -637,13 +660,13 @@ class datetime:
         if tz is None:
             raise NotImplementedError
         else:
-            dt = cls(*_tmod.gmtime(ts)[:6], microsecond=us, tzinfo=tz)
+            dt = cls(*_time2.gmtime(ts)[:6], microsecond=us, tzinfo=tz)
             dt = tz.fromutc(dt)
         return dt
 
     @classmethod
     def now(cls, tz=None):
-        return cls.fromtimestamp(_tmod.time(), tz)
+        return cls.fromtimestamp(_time.time(), tz)
 
     @classmethod
     def fromordinal(cls, n):
@@ -830,10 +853,10 @@ class datetime:
 
     def timetuple(self):
         if self._tz is None:
-            conv = _tmod.gmtime
+            conv = _time2.gmtime
             epoch = datetime.EPOCH.replace(tzinfo=None)
         else:
-            conv = _tmod.localtime
+            conv = _time2.localtime
             epoch = datetime.EPOCH
         return conv(round((self - epoch).total_seconds()))
 
@@ -853,7 +876,7 @@ class datetime:
         return self._d % 7 or 7
 
     def isoformat(self, sep="T", timespec="auto"):
-        return _d2iso(self._d) + sep + _t2iso(self._t, timespec, self, self._tz)
+        return date_to_iso(self._d) + sep + _t2iso(self._t, timespec, self, self._tz)
 
     def __repr__(self):
         Y, M, D, h, m, s, us, tz, fold = self.tuple()
@@ -875,5 +898,3 @@ class datetime:
         t = self._t.tuple()[1:]
         return d + t + (self._tz, self._fd)
 
-
-datetime.EPOCH = datetime(*_tmod.gmtime(0)[:6], tzinfo=timezone.utc)

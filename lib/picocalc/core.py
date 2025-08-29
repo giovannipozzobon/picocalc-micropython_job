@@ -53,6 +53,7 @@ class PicoDisplay(framebuf.FrameBuffer):
     def __init__( self,
                   width,
                   height,
+                  refresh = False,
                   color_type = framebuf.GS4_HMSB,
                   skip_init = False ):
         '''
@@ -63,6 +64,7 @@ class PicoDisplay(framebuf.FrameBuffer):
         - skip_init : Flag to not initialize the underlying C++ picocalc display driver
         '''
 
+        self.manual_refresh = refresh
         self.width = width
         self.height = height
         self.color_type = color_type
@@ -87,6 +89,9 @@ class PicoDisplay(framebuf.FrameBuffer):
     def init(self):
         picocalcdisplay.init(self.buffer, self.color_type,True)
 
+    def setManual(self, toggle):
+        self.manual_refresh = toggle
+
     def resetLUT(self):
         picocalcdisplay.resetLUT(0)
 
@@ -100,7 +105,7 @@ class PicoDisplay(framebuf.FrameBuffer):
             raise ValueError("Unknown LUT name. Use 'vt100' or 'pico8'.")
 
     def getLUT(self):
-        return struct.unpack('H', picocalcdisplay.getLUTview() )
+        return picocalcdisplay.getLUTview().cast("H")
 
     def setLUT(self,lut):
         if not (isinstance(lut, array.array)):
@@ -108,15 +113,23 @@ class PicoDisplay(framebuf.FrameBuffer):
         picocalcdisplay.setLUT(lut)
 
     def stopRefresh(self):
+        if self.manual_refresh:
+            return
         picocalcdisplay.stopAutoUpdate()
 
     def recoverRefresh(self):
+        if self.manual_refresh:
+            return
         picocalcdisplay.startAutoUpdate()
 
     def text(self,c, x0, y0, color):
+        if self.manual_refresh:
+            return
         picocalcdisplay.drawTxt6x8(c,x0,y0,color)
 
     def show(self,core=1):
+        if self.manual_refresh:
+            return
         picocalcdisplay.update(core)
 
     def isScreenUpdateDone(self):

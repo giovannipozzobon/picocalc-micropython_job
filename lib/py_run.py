@@ -1,8 +1,6 @@
-
-#  Micropython Libraries
 import gc
 import logging
-import os.path
+import os
 import sys
 
 import picocalc.core as pc
@@ -174,6 +172,7 @@ def file_management_menu():
 
         print("\nFile Operations:")
         print("D: Delete a file")
+        print("E: Edit a file")
         print("B: Back to main menu")
 
         choice = input("\nEnter choice: ").strip().lower()
@@ -197,20 +196,38 @@ def file_management_menu():
             except ValueError:
                 print("Invalid input. Please enter a number.")
                 input("Press Enter to continue...")
+        elif choice == "e":
+            print("\nSelect file to edit:")
+            for i, name in enumerate(scripts):
+                print(f"{i + 1}: {name}.py")
+
+            edit_choice = input("\nEnter file number to edit: ").strip()
+            try:
+                index = int(edit_choice) - 1
+                if 0 <= index < len(scripts):
+                    import picocalc
+                    picocalc.edit(f"/sd/{scripts[index]}.py")
+                    input("Press Enter to continue...")
+                else:
+                    print("Invalid selection.")
+                    input("Press Enter to continue...")
+            except ValueError:
+                print("Invalid input. Please enter a number.")
+                input("Press Enter to continue...")
         else:
             print("Invalid choice.")
             input("Press Enter to continue...")
 
 def main_menu():
 
+    #  Load all scripts within ./launch_scripts
+    scripts = find_py_files()
+
+    print("\n=== PicoCalc Main Menu ===")
+    for i, name in enumerate(scripts):
+        print(f"{i + 1}: Run {name}")
+
     while True:
-
-        #  Load all scripts within ./launch_scripts
-        scripts = find_py_files( '/launch_scripts' )
-
-        print("\n=== PicoCalc Main Menu ===")
-        for i, name in enumerate(scripts):
-            print(f"{i + 1}: Run {name}")
 
         print("\nOptions:")
         print("X: Exit to prompt")
@@ -222,6 +239,7 @@ def main_menu():
         choice = input("\nEnter choice: ").strip().lower()
 
         if choice == "x":
+            print("Exiting to prompt.")
             return
         elif choice == "r":
             print( 'Reloading menu...' )

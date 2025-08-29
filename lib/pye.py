@@ -274,7 +274,6 @@ class Editor:
 
     def scroll_up(self, scrolling):
         if Editor.TERMCMD[9]:
-            #Editor.scrbuf[scrolling:] = Editor.scrbuf[:-scrolling]
             Editor.scrbuf[scrolling:-1] = Editor.scrbuf[:-scrolling-1]
             Editor.scrbuf[:scrolling] = [""] * scrolling
             self.goto(0, 0)
@@ -282,7 +281,6 @@ class Editor:
 
     def scroll_down(self, scrolling):
         if Editor.TERMCMD[10]:
-            #Editor.scrbuf[:-scrolling] = Editor.scrbuf[scrolling:]
             Editor.scrbuf[:-scrolling-1] = Editor.scrbuf[scrolling:-1]
             Editor.scrbuf[-scrolling:] = [""] * scrolling
             self.goto(Editor.height - 1, 0)

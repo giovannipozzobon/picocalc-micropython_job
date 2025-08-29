@@ -8,11 +8,10 @@ import uos
 
 #  Project Libraries
 import vtterminal
-
+from picocalc_sys import screenshot_bmp
 
 sc_char_width =  const(53)
 sc_char_height =  const(40)
-
 
 def ensure_nested_dir(path):
     parts = path.split("/")
@@ -26,10 +25,7 @@ def ensure_nested_dir(path):
         except OSError:
             uos.mkdir(current)
 
-
-
 class vt(uio.IOBase):
-
 
     def __init__( self,
                   framebuf,
@@ -58,12 +54,14 @@ class vt(uio.IOBase):
         vtterminal.init(self.framebuf)
         self.keyboard = keyboard
         self.screencaptureKey = screencaptureKey
-
+    
+    def setsd(self, sd):
+        self.sd=sd
+        
     def screencapture(self):
         if self.sd:
-            filename = "{}screen_{}.raw".format(self.captureFolder, time.ticks_ms())
-            with open(filename, "wb") as f:
-                f.write(self.framebuf.buffer)
+            filename = "{}screen_{}.bmp".format(self.captureFolder, time.ticks_ms())
+            screenshot_bmp(self.framebuf.buffer, filename)
             return True
         return False
 
