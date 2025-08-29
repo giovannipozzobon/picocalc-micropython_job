@@ -158,7 +158,9 @@ def show_system_status():
         print(f"Error getting storage info: {e}")
 
 def file_management_menu():
-    """Sub-menu for file management operations"""
+    '''
+    Sub-menu for file management operations
+    '''
     while True:
         scripts = find_py_files()
         if not scripts:
