@@ -1,5 +1,5 @@
 
-#  Micropython Libraries
+#  Micropython Standard Libraries
 from micropython import const
 import io
 import sys
@@ -217,13 +217,13 @@ def getLogger( name = None ):
     
     if name is None:
         name = "root"
-        
+
     if name not in _loggers.keys():
         _loggers[name] = Logger(name)
-        
-        if name == "root":
+
+        if name == 'root':
             basicConfig()
-            
+
     return _loggers[name]
 
 
