@@ -144,7 +144,7 @@ class PicoKeyboard:
         self.ignor = True
         self.address = address
         self.temp=bytearray(2)
-        self.reset()
+        #self.reset() Jobond 15/09/2025
         self.isShift = False
         self.isCtrl = False
         self.isAlt = False
